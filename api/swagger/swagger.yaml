@@ -1,0 +1,65 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Hello World App
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths
+basePath: /
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /employee:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: get_employee
+    get:
+      description: Returns an employee
+      # used as the method name of the controller
+      operationId: getEmployee
+      parameters:
+        - name: auth_id
+          in: query
+          description: The employee's ID
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/EmployeeResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  EmployeeResponse:
+    type: object
+    required:
+      - auth_id
+    properties:
+      auth_id:
+        type: string
+      current_balance:
+        type: number
+      name:
+        type: string
+      isAdmin:
+        type: boolean
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
