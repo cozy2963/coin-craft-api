@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   version: "0.0.1"
-  title: Hello World App
+  title: Coin + Craft API
 # during dev, should point to your local machine
 host: localhost:10010
 # basePath prefixes all resource paths
@@ -36,6 +36,55 @@ paths:
           description: Success
           schema:
             $ref: "#/definitions/EmployeeResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /expenses:
+    x-swagger-router-controller: get_employee
+    post:
+      description: Adds a new expense
+      operationId: createExpense
+      parameters:
+        - name: expense
+          in: body
+          description: The new expense
+          schema:
+            required:
+              - amount
+            type: object
+            properties:
+              amount:
+                type: string
+              approver:
+                type: string
+              business_name:
+                type: string
+              client:
+                type: string
+              employee_auth_id:
+                type: string
+              employee_name:
+                type: string
+              expense_description:
+                type: string
+              expense_type:
+                type: string
+              miles_amount:
+                type: string
+              receipt:
+                type: string
+              receipt_date:
+                type: string
+              receipt_type:
+                type: string
+              submitted:
+                type: string
+              submitted_month:
+                type: string  
+      responses:
+        "200":
+          description: Success
         default:
           description: Error
           schema:

@@ -11,9 +11,11 @@ admin.initializeApp({
 
 var db = admin.database();
 var ref = db.ref("employees");
+var expensesRef = db.ref("expenses");
 
 module.exports = {
-  getEmployee: getEmployee
+  getEmployee: getEmployee,
+  createExpense: createExpense
 };
 
 function getEmployee(req, res) {
@@ -28,4 +30,10 @@ function getEmployee(req, res) {
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
   });
+}
+
+function createExpense(req,res) {
+  var newExpense = req.swagger.params.expense.value;
+  expensesRef.push().set(newExpense);
+  res.json(newExpense);
 }
