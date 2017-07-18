@@ -69,11 +69,7 @@ paths:
 definitions:
   EmployeeResponse:
     type: object
-    required:
-      - auth_id
     properties:
-      auth_id:
-        type: string
       current_balance:
         type: number
       name:
@@ -84,20 +80,31 @@ definitions:
     type: object
     required:
       - amount
+      - employee_auth_id
     properties:
       amount:
         type: string
-      business_name:
+      approved_by:
         type: string
-      client:
+      client_name:
+        type: string
+      employee_auth_id:
+        type: string
+      employee_name:
+        type: string
+      expense_business_name:
+        type: string
+      expense_description:
         type: string
       expense_type:
         type: string
       miles_amount:
         type: string
-      receipt:
+      receipt_date:
         type: string
-      submitted:
+      receipt_type:
+        type: string
+      submitted_date:
         type: string
   ErrorResponse:
     required:
