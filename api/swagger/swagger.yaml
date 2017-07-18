@@ -82,8 +82,6 @@ definitions:
       - amount
       - employee_auth_id
     properties:
-      amount:
-        type: string
       approved_by:
         type: string
       client_name:
@@ -92,6 +90,8 @@ definitions:
         type: string
       employee_name:
         type: string
+      expense_amount:
+        type: number
       expense_business_name:
         type: string
       expense_description:
@@ -99,7 +99,7 @@ definitions:
       expense_type:
         type: string
       miles_amount:
-        type: string
+        type: number
       receipt_date:
         type: string
       receipt_type:
