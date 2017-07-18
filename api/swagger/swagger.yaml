@@ -52,6 +52,7 @@ paths:
           schema:
             required:
               - amount
+              - employee_auth_id
             type: object
             properties:
               amount:
@@ -81,7 +82,7 @@ paths:
               submitted:
                 type: string
               submitted_month:
-                type: string  
+                type: string
       responses:
         "200":
           description: Success

@@ -32,8 +32,60 @@ function getEmployee(req, res) {
   });
 }
 
-function createExpense(req,res) {
+function createExpense(req, res) {
   var newExpense = req.swagger.params.expense.value;
-  expensesRef.push().set(newExpense);
-  res.json(newExpense);
+  var amount;
+  if(newExpense.receiptSubmitType === 'mileage') {
+    amount = newExpense. * 0.575;
+  } else {
+    amount = this.form.value['expenseAmount'];
+  }
+
+  let balance = Number(this.employee['current_balance']) - Number(this.form.value['expenseAmount']) ;
+
+  let receiptDateString = `${this.selectedDate.month}/${this.selectedDate.day}/${this.selectedDate.year}`;
+
+  if(balance >= 0) {
+    let roundedAmount = (Math.round(amount * 100) / 100).toFixed(2);
+    this.expenses.push({
+      employee_name: this.employee['name'],
+      employee_auth_id: this.employeeID,
+      submitted: new Date().toLocaleDateString(),
+      submitted_month: new Date().getUTCMonth(),
+      expense_type: this.form.value['expenseType'],
+      amount: roundedAmount,
+      receipt: "N/A",
+      receipt_type: this.form.value['receiptSubmitType'],
+      receipt_date: receiptDateString,
+      approver: this.form.value['founder'],
+      business_name: this.form.value['businessName'],
+      miles_amount: (Math.round(this.form.value['milesAmount'] * 100) / 100).toFixed(2),
+      client: this.form.value['clientName'],
+      expense_description: this.form.value['expenseDescription']
+    }).then(_ => {
+      if (this.form.value['expenseType'] !== "notCoinCraft") {
+        this.employees.update(this.employeeKey, {current_balance: balance}).then(_ => {
+          this.saveSuccess = true;
+          this.saveFail = false;
+          this.form.reset();
+        }).catch(error => {
+          this.failMessage = "Something went wrong when trying to update your balance: " + error;
+          this.saveSuccess = false;
+          this.saveFail = true;
+        });
+      } else {
+        this.saveSuccess = true;
+        this.saveFail = false;
+        this.form.reset();
+      }
+    }).catch(error => {
+      this.failMessage = "Something went wrong when trying to submit an expense: " + error;
+      this.saveSuccess = false;
+      this.saveFail = true;
+    });
+  } else {
+    this.failMessage = "You don't have enough in your C+C for this. Current balance: $" + this.employee['current_balance'] ;
+    this.saveSuccess = false;
+    this.saveFail = true;
+  }
 }
