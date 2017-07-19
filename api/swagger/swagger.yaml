@@ -78,8 +78,6 @@ definitions:
         type: boolean
   ExpenseResponse:
     type: object
-    required:
-      - employee_auth_id
     properties:
       approved_by:
         type: string
