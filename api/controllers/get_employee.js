@@ -10,12 +10,13 @@ admin.initializeApp({
 });
 
 var db = admin.database();
-var ref = db.ref("employees");
+var employeesRef = db.ref("employees");
 var expensesRef = db.ref("expenses");
 
 module.exports = {
   getEmployee: getEmployee,
-  createExpense: createExpense
+  createExpense: createExpense,
+  getExpenses: getExpenses
 };
 
 function getEmployee(req, res) {
@@ -23,7 +24,7 @@ function getEmployee(req, res) {
   var id = req.swagger.params.auth_id.value;
   var employee;
 
-  ref.orderByChild("auth_id").equalTo(id).once("value", function(snapshot) {
+  employeesRef.orderByChild("auth_id").equalTo(id).once("value", function(snapshot) {
     var name = Object.getOwnPropertyNames(snapshot.val());
     employee = snapshot.val()[name];
     res.json(employee);
@@ -32,60 +33,31 @@ function getEmployee(req, res) {
   });
 }
 
-function createExpense(req, res) {
-  var newExpense = req.swagger.params.expense.value;
-  var amount;
-  if(newExpense.receiptSubmitType === 'mileage') {
-    amount = newExpense. * 0.575;
-  } else {
-    amount = this.form.value['expenseAmount'];
-  }
+function getExpenses(req, res) {
+  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
+  var id = req.swagger.params.auth_id.value;
 
-  let balance = Number(this.employee['current_balance']) - Number(this.form.value['expenseAmount']) ;
-
-  let receiptDateString = `${this.selectedDate.month}/${this.selectedDate.day}/${this.selectedDate.year}`;
-
-  if(balance >= 0) {
-    let roundedAmount = (Math.round(amount * 100) / 100).toFixed(2);
-    this.expenses.push({
-      employee_name: this.employee['name'],
-      employee_auth_id: this.employeeID,
-      submitted: new Date().toLocaleDateString(),
-      submitted_month: new Date().getUTCMonth(),
-      expense_type: this.form.value['expenseType'],
-      amount: roundedAmount,
-      receipt: "N/A",
-      receipt_type: this.form.value['receiptSubmitType'],
-      receipt_date: receiptDateString,
-      approver: this.form.value['founder'],
-      business_name: this.form.value['businessName'],
-      miles_amount: (Math.round(this.form.value['milesAmount'] * 100) / 100).toFixed(2),
-      client: this.form.value['clientName'],
-      expense_description: this.form.value['expenseDescription']
-    }).then(_ => {
-      if (this.form.value['expenseType'] !== "notCoinCraft") {
-        this.employees.update(this.employeeKey, {current_balance: balance}).then(_ => {
-          this.saveSuccess = true;
-          this.saveFail = false;
-          this.form.reset();
-        }).catch(error => {
-          this.failMessage = "Something went wrong when trying to update your balance: " + error;
-          this.saveSuccess = false;
-          this.saveFail = true;
-        });
-      } else {
-        this.saveSuccess = true;
-        this.saveFail = false;
-        this.form.reset();
-      }
-    }).catch(error => {
-      this.failMessage = "Something went wrong when trying to submit an expense: " + error;
-      this.saveSuccess = false;
-      this.saveFail = true;
+  expensesRef.orderByChild("employee_auth_id").equalTo(id).once("value", function(snapshot) {
+    var expenses = Object.getOwnPropertyNames(snapshot.val());
+    var resExpenses = [];
+    expenses.forEach(function(expense) {
+      resExpenses.push({
+        approved_by: snapshot.val()[expense].approved_by,
+        client_name: snapshot.val()[expense].client_name,
+        employee_auth_id: snapshot.val()[expense].employee_auth_id,
+        employee_name: snapshot.val()[expense].employee_name,
+        expense_amount: snapshot.val()[expense].expense_amount,
+        expense_business_name: snapshot.val()[expense].expense_business_name,
+        expense_description: snapshot.val()[expense].expense_description,
+        expense_type: snapshot.val()[expense].expense_type,
+        miles_amount: snapshot.val()[expense].miles_amount,
+        receipt_date: snapshot.val()[expense].receipt_date,
+        receipt_type: snapshot.val()[expense].receipt_type,
+        submitted_date: snapshot.val()[expense].submitted_date
+      });
     });
-  } else {
-    this.failMessage = "You don't have enough in your C+C for this. Current balance: $" + this.employee['current_balance'] ;
-    this.saveSuccess = false;
-    this.saveFail = true;
-  }
+    res.json(resExpenses);
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });
 }
