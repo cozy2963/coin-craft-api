@@ -41,13 +41,18 @@ function getExpenses(req, res) {
     var resExpenses = [];
     expenses.forEach(function(expense) {
       resExpenses.push({
-        amount: snapshot.val()[expense].amount,
-        business_name: snapshot.val()[expense].business_name,
-        client: snapshot.val()[expense].client,
+        approved_by: snapshot.val()[expense].approved_by,
+        client_name: snapshot.val()[expense].client_name,
+        employee_auth_id: snapshot.val()[expense].employee_auth_id,
+        employee_name: snapshot.val()[expense].employee_name,
+        expense_amount: snapshot.val()[expense].expense_amount,
+        expense_business_name: snapshot.val()[expense].expense_business_name,
+        expense_description: snapshot.val()[expense].expense_description,
         expense_type: snapshot.val()[expense].expense_type,
         miles_amount: snapshot.val()[expense].miles_amount,
-        receipt: snapshot.val()[expense].receipt,
-        submitted: snapshot.val()[expense].submitted
+        receipt_date: snapshot.val()[expense].receipt_date,
+        receipt_type: snapshot.val()[expense].receipt_type,
+        submitted_date: snapshot.val()[expense].submitted_date
       });
     });
     res.json(resExpenses);
