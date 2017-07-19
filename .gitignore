@@ -34,3 +34,4 @@ node_modules
 config/runtime.yaml
 
 db-admin.json
+yarn.lock

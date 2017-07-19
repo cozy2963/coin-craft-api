@@ -40,23 +40,69 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /expenses:
+    x-swagger-router-controller: get_employee
+    get:
+      description: Returns an employee's expenses
+      # used as the method name of the controller
+      operationId: getExpenses
+      parameters:
+        - name: auth_id
+          in: query
+          description: The employee's ID
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/ExpenseResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
 definitions:
   EmployeeResponse:
     type: object
-    required:
-      - auth_id
     properties:
-      auth_id:
-        type: string
       current_balance:
         type: number
       name:
         type: string
       isAdmin:
         type: boolean
+  ExpenseResponse:
+    type: object
+    properties:
+      approved_by:
+        type: string
+      client_name:
+        type: string
+      employee_auth_id:
+        type: string
+      employee_name:
+        type: string
+      expense_amount:
+        type: number
+      expense_business_name:
+        type: string
+      expense_description:
+        type: string
+      expense_type:
+        type: string
+      miles_amount:
+        type: number
+      receipt_date:
+        type: string
+      receipt_type:
+        type: string
+      submitted_date:
+        type: string
   ErrorResponse:
     required:
       - message
