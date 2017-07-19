@@ -79,7 +79,6 @@ definitions:
   ExpenseResponse:
     type: object
     required:
-      - amount
       - employee_auth_id
     properties:
       approved_by:
