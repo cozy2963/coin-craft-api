@@ -61,3 +61,7 @@ function getExpenses(req, res) {
     console.log("The read failed: " + errorObject.code);
   });
 }
+
+function createExpense(req, res) {
+  
+}

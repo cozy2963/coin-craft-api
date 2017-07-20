@@ -48,7 +48,9 @@ The above request should return an employee object that looks something like thi
 
 ### /employee
 **GET:** returns an employee
+
 Required parameter: `auth_id` (string)
+
 200 Response:
 ```json
 {
@@ -63,10 +65,13 @@ Error Response:
 {
   "message": "string"
 }
+```
 
 ### /expenses
 **GET:** returns all of a certain employee's expenses
+
 Required parameter: `auth_id` (string)
+
 200 Response:
 ```json
 {
@@ -90,3 +95,4 @@ Error Response:
 {
   "message": "string"
 }
+```
