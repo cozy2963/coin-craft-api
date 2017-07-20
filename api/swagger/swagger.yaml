@@ -42,7 +42,6 @@ paths:
             $ref: "#/definitions/ErrorResponse"
   /expenses:
     x-swagger-router-controller: get_employee
-<<<<<<< HEAD
     post:
       description: Adds a new expense
       operationId: createExpense
@@ -51,43 +50,11 @@ paths:
           in: body
           description: The new expense
           schema:
-            required:
-              - amount
-              - employee_auth_id
             type: object
-            properties:
-              amount:
-                type: string
-              approver:
-                type: string
-              business_name:
-                type: string
-              client:
-                type: string
-              employee_auth_id:
-                type: string
-              employee_name:
-                type: string
-              expense_description:
-                type: string
-              expense_type:
-                type: string
-              miles_amount:
-                type: string
-              receipt:
-                type: string
-              receipt_date:
-                type: string
-              receipt_type:
-                type: string
-              submitted:
-                type: string
-              submitted_month:
-                type: string
+            $ref: "#/definitions/ExpenseResponse"
       responses:
         "200":
           description: Success
-=======
     get:
       description: Returns an employee's expenses
       # used as the method name of the controller
@@ -105,7 +72,6 @@ paths:
             type: array
             items:
               $ref: "#/definitions/ExpenseResponse"
->>>>>>> master
         default:
           description: Error
           schema:
