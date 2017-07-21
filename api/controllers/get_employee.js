@@ -65,7 +65,6 @@ function getExpenses(req, res) {
 function createExpense(req, res) {
 
   var expense = req.swagger.params.expense.value;
-  var newExpense;
   var amount;
   var employee;
 
@@ -87,7 +86,7 @@ function createExpense(req, res) {
   if(employee.current_balance >= 0) {
     var roundedAmount = (Math.round(amount * 100) / 100).toFixed(2);
 
-    newExpense = {
+    expensesRef.push({
       employee_name: employee.name,
       employee_auth_id: expense.employee_auth_id,
       submitted_date: new Date().toLocaleDateString(),
@@ -100,32 +99,10 @@ function createExpense(req, res) {
       miles_amount: Number((Math.round(expense.miles_amount * 100) / 100).toFixed(2)),
       client_name: expense.client_name,
       expense_description: expense.expense_description
-    };
-
-    expense.push(newExpense).then(_ => {
+    }).then(_ => {
       if (expense.expense_type !== "notCoinCraft") {
-        employeesRef.update(employee.auth_id, {current_balance: balance}).then(_ => {
-          this.saveSuccess = true;
-          this.saveFail = false;
-          this.form.reset();
-        }).catch(error => {
-          this.failMessage = "Something went wrong when trying to update your balance: " + error;
-          this.saveSuccess = false;
-          this.saveFail = true;
-        });
-      } else {
-        this.saveSuccess = true;
-        this.saveFail = false;
-        this.form.reset();
-      }
-    }).catch(error => {
-      this.failMessage = "Something went wrong when trying to submit an expense: " + error;
-      this.saveSuccess = false;
-      this.saveFail = true;
-    });
-  } else {
-    this.failMessage = "You don't have enough in your C+C for this. Current balance: $" + employee.current_balance ;
-    this.saveSuccess = false;
-    this.saveFail = true;
+        employeesRef.update(employee.auth_id, {current_balance: balance});
+      });
+    }
   }
 }
