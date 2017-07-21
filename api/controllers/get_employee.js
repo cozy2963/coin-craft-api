@@ -64,69 +64,68 @@ function getExpenses(req, res) {
 
 function createExpense(req, res) {
 
-    var expense = req.swagger.params.expense.value;
-    var amount;
-    var employee;
+  var expense = req.swagger.params.expense.value;
+  var newExpense;
+  var amount;
+  var employee;
 
-    employeesRef.orderByChild("auth_id").equalTo(expense.employee_auth_id).once("value", function(snapshot) {
-      var name = Object.getOwnPropertyNames(snapshot.val());
-      employee = snapshot.val()[name];
+  employeesRef.orderByChild("auth_id").equalTo(expense.employee_auth_id).once("value", function(snapshot) {
+    var name = Object.getOwnPropertyNames(snapshot.val());
+    employee = snapshot.val()[name];
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });
 
-    }, function (errorObject) {
-      console.log("The read failed: " + errorObject.code);
-    });
+  if(expense.receipt_type == 'mileage') {
+    amount = expense.miles_amount * 0.575;
+  } else {
+    amount = expense.expense_amount;
   }
 
-    if(expense.receipt_type == 'mileage') {
-      amount = expense.miles_amount * 0.575;
-    } else {
-      amount = expense.expense_amount;
-    }
+  var balance = Number(employee.current_balance) - Number(amount);
 
-    var balance = Number(employee.current_balance) - Number(amount);
+  if(employee.current_balance >= 0) {
+    var roundedAmount = (Math.round(amount * 100) / 100).toFixed(2);
 
-    var receiptDateString = `${this.selectedDate.month}/${this.selectedDate.day}/${this.selectedDate.year}`;
+    newExpense = {
+      employee_name: employee.name,
+      employee_auth_id: expense.employee_auth_id,
+      submitted_date: new Date().toLocaleDateString(),
+      expense_type: expense.expense_type,
+      expense_amount: roundedAmount,
+      receipt_type: expense.receipt_type,
+      receipt_date: expense.receipt_date,
+      approved_by: expense.approved_by,
+      expense_business_name: expense.expense_business_name,
+      miles_amount: Number((Math.round(expense.miles_amount * 100) / 100).toFixed(2)),
+      client_name: expense.client_name,
+      expense_description: expense.expense_description
+    };
 
-    if(employee.current_balance >= 0) {
-      var roundedAmount = (Math.round(amount * 100) / 100).toFixed(2);
-
-      expense.push({
-        employee_name: this.employee['name'],
-        employee_auth_id: this.employeeID,
-        submitted_date: new Date().toLocaleDateString(),
-        expense_type: this.form.value['expenseType'],
-        expense_amount: Number(roundedAmount),
-        receipt_type: this.form.value['receiptSubmitType'],
-        receipt_date: receiptDateString,
-        approved_by: this.form.value['founder'],
-        expense_business_name: this.form.value['businessName'],
-        miles_amount: Number((Math.round(this.form.value['milesAmount'] * 100) / 100).toFixed(2)),
-        client_name: this.form.value['clientName'],
-        expense_description: this.form.value['expenseDescription']
-      }).then(_ => {
-        if (this.form.value['expenseType'] !== "notCoinCraft") {
-          this.employees.update(this.employeeKey, {current_balance: balance}).then(_ => {
-            this.saveSuccess = true;
-            this.saveFail = false;
-            this.form.reset();
-          }).catch(error => {
-            this.failMessage = "Something went wrong when trying to update your balance: " + error;
-            this.saveSuccess = false;
-            this.saveFail = true;
-          });
-        } else {
+    expense.push(newExpense).then(_ => {
+      if (expense.expense_type !== "notCoinCraft") {
+        employeesRef.update(employee.auth_id, {current_balance: balance}).then(_ => {
           this.saveSuccess = true;
           this.saveFail = false;
           this.form.reset();
-        }
-      }).catch(error => {
-        this.failMessage = "Something went wrong when trying to submit an expense: " + error;
-        this.saveSuccess = false;
-        this.saveFail = true;
-      });
-    } else {
-      this.failMessage = "You don't have enough in your C+C for this. Current balance: $" + this.employee['current_balance'] ;
+        }).catch(error => {
+          this.failMessage = "Something went wrong when trying to update your balance: " + error;
+          this.saveSuccess = false;
+          this.saveFail = true;
+        });
+      } else {
+        this.saveSuccess = true;
+        this.saveFail = false;
+        this.form.reset();
+      }
+    }).catch(error => {
+      this.failMessage = "Something went wrong when trying to submit an expense: " + error;
       this.saveSuccess = false;
       this.saveFail = true;
-    }
-  } 
+    });
+  } else {
+    this.failMessage = "You don't have enough in your C+C for this. Current balance: $" + employee.current_balance ;
+    this.saveSuccess = false;
+    this.saveFail = true;
+  }
+}
