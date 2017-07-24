@@ -49,8 +49,8 @@ paths:
         - name: expense
           in: body
           description: The new expense
+          required: true
           schema:
-            type: object
             $ref: "#/definitions/ExpenseResponse"
       responses:
         "200":
