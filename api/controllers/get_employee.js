@@ -71,7 +71,7 @@ function createExpense(req, res) {
     var name = Object.getOwnPropertyNames(snapshot.val())[0];
     employee = snapshot.val()[name];
 
-    if(expense.receipt_type == 'mileage') {
+    if(expense.receipt_type == 'MILEAGE') {
       amount = expense.miles_amount * 0.575;
     } else {
       amount = expense.expense_amount;
@@ -95,7 +95,7 @@ function createExpense(req, res) {
         client_name: expense.client_name,
         expense_description: expense.expense_description
       }).then(_ => {
-        if (expense.expense_type !== "notCoinCraft") {
+        if (expense.expense_type !== "NOT_CC") {
           var employeeRef = employeesRef.child(name);
           employeeRef.update({"current_balance": balance}).then(_ => {
             console.log("It updated!");
