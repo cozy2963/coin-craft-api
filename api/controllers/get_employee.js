@@ -68,7 +68,13 @@ function createExpense(req, res) {
   var amount, employee, balance;
 
   employeesRef.orderByChild("auth_id").equalTo(expense.employee_auth_id).once("value", function(snapshot) {
-    var name = Object.getOwnPropertyNames(snapshot.val())[0];
+    var name;
+    if(snapshot.val()) {
+      name = Object.getOwnPropertyNames(snapshot.val())[0]
+    } else {
+      res.status(400).json({"message": "Cannot find employee."});
+      res.end();
+    }
     employee = snapshot.val()[name];
 
     if(expense.receipt_type == 'MILEAGE') {
@@ -98,11 +104,13 @@ function createExpense(req, res) {
         if (expense.expense_type !== "NOT_CC") {
           var employeeRef = employeesRef.child(name);
           employeeRef.update({"current_balance": balance}).then(_ => {
+            res.status(200).json({"message": "Expense submitted."})
           }, error => {
-            res.json({"message": error});
+            res.status(500).json({"message": error});
           });
+        } else {
+          res.status(200).json({"message": "Expense submitted."});
         }
-        res.status(200).json({"message": "Expense submitted."})
       }, error => {
         res.status(500).json({"message": error});
       });
