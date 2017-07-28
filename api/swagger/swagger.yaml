@@ -32,8 +32,10 @@ paths:
           required: true
           type: string
       responses:
-        "200":
+        200:
           description: Success
+        500:
+          description: Error  
           schema:
             $ref: "#/definitions/EmployeeResponse"
         default:
@@ -53,8 +55,12 @@ paths:
           schema:
             $ref: "#/definitions/ExpenseResponse"
       responses:
-        "200":
+        200:
           description: Success
+        400:
+          description:  Bad request.
+        500:
+          description: Internal server error.
           schema:
             $ref: "#/definitions/ErrorResponse"
     get:
@@ -68,7 +74,7 @@ paths:
           required: true
           type: string
       responses:
-        "200":
+        200:
           description: Success
           schema:
             type: array
