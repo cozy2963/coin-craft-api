@@ -98,17 +98,16 @@ function createExpense(req, res) {
         if (expense.expense_type !== "NOT_CC") {
           var employeeRef = employeesRef.child(name);
           employeeRef.update({"current_balance": balance}).then(_ => {
-            console.log("It updated!");
           }, error => {
-            console.log(error);
+            res.json({"message": error});
           });
         }
-        console.log("Submitted expense worked!");
+        res.status(200).json({"message": "Expense submitted."})
       }, error => {
-        console.log(error);
+        res.status(500).json({"message": error});
       });
     }
-  }, function (errorObject) {
-    console.log("The read failed: " + errorObject.code);
+  }, error => {
+    res.status(400).json({"message": error});
   });
 }

@@ -55,6 +55,8 @@ paths:
       responses:
         "200":
           description: Success
+          schema:
+            $ref: "#/definitions/ErrorResponse"
     get:
       description: Returns an employee's expenses
       # used as the method name of the controller
