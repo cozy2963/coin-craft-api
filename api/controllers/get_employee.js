@@ -15,6 +15,7 @@ var expensesRef = db.ref("expenses");
 
 module.exports = {
   getEmployee: getEmployee,
+  createExpense: createExpense,
   getExpenses: getExpenses
 };
 
@@ -58,5 +59,63 @@ function getExpenses(req, res) {
     res.json(resExpenses);
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
+  });
+}
+
+function createExpense(req, res) {
+
+  var expense = req.body;
+  var amount, employee, balance;
+
+  employeesRef.orderByChild("auth_id").equalTo(expense.employee_auth_id).once("value", function(snapshot) {
+    var name;
+    if(snapshot.val()) {
+      name = Object.getOwnPropertyNames(snapshot.val())[0]
+    } else {
+      res.status(400).json({"message": "Cannot find employee."});
+      res.end();
+    }
+    employee = snapshot.val()[name];
+
+    if(expense.receipt_type == 'MILEAGE') {
+      amount = expense.miles_amount * 0.575;
+    } else {
+      amount = expense.expense_amount;
+    }
+
+    balance = Number(employee.current_balance) - Number(amount);
+
+    var roundedAmount = Number((Math.round(amount * 100) / 100).toFixed(2));
+    if (balance >= 0) {
+      expensesRef.push({
+        employee_name: employee.name,
+        employee_auth_id: expense.employee_auth_id,
+        submitted_date: new Date().toLocaleDateString(),
+        expense_type: expense.expense_type,
+        expense_amount: roundedAmount,
+        receipt_type: expense.receipt_type,
+        receipt_date: expense.receipt_date,
+        approved_by: expense.approved_by,
+        expense_business_name: expense.expense_business_name,
+        miles_amount: Number((Math.round(expense.miles_amount * 100) / 100).toFixed(2)) || 0,
+        client_name: expense.client_name,
+        expense_description: expense.expense_description
+      }).then(_ => {
+        if (expense.expense_type !== "NOT_CC") {
+          var employeeRef = employeesRef.child(name);
+          employeeRef.update({"current_balance": balance}).then(_ => {
+            res.status(200).json({"message": "Expense submitted."})
+          }, error => {
+            res.status(500).json({"message": error});
+          });
+        } else {
+          res.status(200).json({"message": "Expense submitted."});
+        }
+      }, error => {
+        res.status(500).json({"message": error});
+      });
+    }
+  }, error => {
+    res.status(400).json({"message": error});
   });
 }
