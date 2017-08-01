@@ -12,11 +12,13 @@ admin.initializeApp({
 var db = admin.database();
 var employeesRef = db.ref("employees");
 var expensesRef = db.ref("expenses");
+var rolesRef = db.ref("roles").child("employees");
 
 module.exports = {
   getEmployee: getEmployee,
   createExpense: createExpense,
-  getExpenses: getExpenses
+  getExpenses: getExpenses,
+  getAccess: getAccess
 };
 
 function getEmployee(req, res) {
@@ -117,5 +119,19 @@ function createExpense(req, res) {
     }
   }, error => {
     res.status(400).json({"message": error});
+  });
+}
+
+function getAccess(req, res) {
+  var id = req.swagger.params.auth_id.value;
+  rolesRef.orderByKey().equalTo(id).once("value", function(snapshot) {
+    console.log(snapshot.val());
+    if (snapshot.val()) {
+      res.status(200).json({"hasAccess": true});
+    } else {
+      res.status(200).json({"hasAccess": false});
+    }
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
   });
 }
