@@ -125,7 +125,6 @@ function createExpense(req, res) {
 function getAccess(req, res) {
   var id = req.swagger.params.auth_id.value;
   rolesRef.orderByKey().equalTo(id).once("value", function(snapshot) {
-    console.log(snapshot.val());
     if (snapshot.val()) {
       res.status(200).json({"hasAccess": true});
     } else {
