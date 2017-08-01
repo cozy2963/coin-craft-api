@@ -78,6 +78,28 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /has-access:
+    x-swagger-router-controller: get_employee
+    get:
+      description: Returns a boolean indicating whether or not an employee has C+C access
+      operationId: getAccess
+      parameters:
+        - name: auth_id
+          in: query
+          description: The employee's ID
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            properties:
+              has_access:
+                type: boolean
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
